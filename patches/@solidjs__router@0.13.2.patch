@@ -1,0 +1,37 @@
+diff --git a/dist/routers/Router.js b/dist/routers/Router.js
+index 65cd04974482bb2968180d0da17f2083ff2f214f..13719e379e3a9142f31ed5c71739510d81ec3a85 100644
+--- a/dist/routers/Router.js
++++ b/dist/routers/Router.js
+@@ -6,10 +6,13 @@ import { createBeforeLeave, keepDepth, notifyIfNotBlocked, saveCurrentDepth } fr
+ export function Router(props) {
+     if (isServer)
+         return StaticRouter(props);
+-    const getSource = () => ({
+-        value: window.location.pathname + window.location.search + window.location.hash,
+-        state: window.history.state
+-    });
++    const getSource = () => {
++        const url = window.location.pathname + window.location.search;
++        return {
++          value: props.transformUrl ? props.transformUrl(url) + window.location.hash : url + window.location.hash,
++          state: window.history.state
++        }
++    };
+     const beforeLeave = createBeforeLeave();
+     return createRouter({
+         get: getSource,
+diff --git a/dist/routers/StaticRouter.js b/dist/routers/StaticRouter.js
+index 4b49262f8702dafa2a56cd1f842ce698e386f6a9..9cf87de1064b1dad4e2b7abf0c7fd68bf14c2978 100644
+--- a/dist/routers/StaticRouter.js
++++ b/dist/routers/StaticRouter.js
+@@ -6,8 +6,9 @@ function getPath(url) {
+ }
+ export function StaticRouter(props) {
+     let e;
++    const url = props.url || ((e = getRequestEvent()) && getPath(e.request.url)) || ""
+     const obj = {
+-        value: props.url || ((e = getRequestEvent()) && getPath(e.request.url)) || ""
++        value: props.transformUrl ? props.transformUrl(url) : url,
+     };
+     return createRouterComponent({
+         signal: [() => obj, next => Object.assign(obj, next)]
