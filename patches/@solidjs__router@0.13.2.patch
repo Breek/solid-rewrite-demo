@@ -1,5 +1,70 @@
+diff --git a/dist/data/events.js b/dist/data/events.js
+index 3498ecd4d54acc0efe1d5f3b3782290da73a3796..d29296a4d492cacb3bb1ba91c835953b48057c87 100644
+--- a/dist/data/events.js
++++ b/dist/data/events.js
+@@ -2,7 +2,7 @@ import { delegateEvents } from "solid-js/web";
+ import { onCleanup } from "solid-js";
+ import { actions } from "./action.js";
+ import { mockBase } from "../utils.js";
+-export function setupNativeEvents(preload = true, explicitLinks = false, actionBase = "/_server") {
++export function setupNativeEvents(preload = true, explicitLinks = false, actionBase = "/_server", transformUrl) {
+     return (router) => {
+         const basePath = router.base.path();
+         const navigateFromRoute = router.navigatorFactory(router.base);
+@@ -41,8 +41,9 @@ export function setupNativeEvents(preload = true, explicitLinks = false, actionB
+             const res = handleAnchor(evt);
+             if (!res)
+                 return;
+-            const [a, url] = res;
++            let [a, url] = res;
+             const to = router.parsePath(url.pathname + url.search + url.hash);
++            console.log("handleAnchorClick to", to);
+             const state = a.getAttribute("state");
+             evt.preventDefault();
+             navigateFromRoute(to, {
+@@ -57,14 +58,27 @@ export function setupNativeEvents(preload = true, explicitLinks = false, actionB
+             if (!res)
+                 return;
+             const [a, url] = res;
+-            if (!preloadTimeout[url.pathname])
++            console.log("handleAnchorPreload url 1", url);
++            if (typeof transformUrl === "function") {
++                url.pathname = transformUrl(url.pathname);
++            }
++            console.log("handleAnchorPreload url 2", url);
++            if (!preloadTimeout[url.pathname]) {
++                
+                 router.preloadRoute(url, a.getAttribute("preload") !== "false");
++            }
+         }
+         function handleAnchorIn(evt) {
+             const res = handleAnchor(evt);
+             if (!res)
+                 return;
+             const [a, url] = res;
++            
++            console.log("handleAnchorIn url.pathname", url.pathname);
++            if (typeof transformUrl === "function") {
++                url.pathname = transformUrl(url.pathname);
++            }
++            console.log("handleAnchorIn url.pathname", url.pathname);
+             if (preloadTimeout[url.pathname])
+                 return;
+             preloadTimeout[url.pathname] = setTimeout(() => {
+@@ -77,6 +91,11 @@ export function setupNativeEvents(preload = true, explicitLinks = false, actionB
+             if (!res)
+                 return;
+             const [, url] = res;
++            console.log("handleAnchorOut url.pathname", url.pathname);
++            if (typeof transformUrl === "function") {
++                url.pathname = transformUrl(url.pathname);
++            }
++            console.log("handleAnchorOut url.pathname", url.pathname);
+             if (preloadTimeout[url.pathname]) {
+                 clearTimeout(preloadTimeout[url.pathname]);
+                 delete preloadTimeout[url.pathname];
 diff --git a/dist/routers/Router.js b/dist/routers/Router.js
-index 65cd04974482bb2968180d0da17f2083ff2f214f..f353873f36c12b2d4c01453168c4e560308cb29d 100644
+index 65cd04974482bb2968180d0da17f2083ff2f214f..e90bf0b6a038d30d1709c64c0a1ffaa8b8a26f51 100644
 --- a/dist/routers/Router.js
 +++ b/dist/routers/Router.js
 @@ -6,10 +6,13 @@ import { createBeforeLeave, keepDepth, notifyIfNotBlocked, saveCurrentDepth } fr
@@ -20,6 +85,15 @@ index 65cd04974482bb2968180d0da17f2083ff2f214f..f353873f36c12b2d4c01453168c4e560
      const beforeLeave = createBeforeLeave();
      return createRouter({
          get: getSource,
+@@ -32,7 +35,7 @@ export function Router(props) {
+                 return !beforeLeave.confirm(s.value, { state: s.state });
+             }
+         })),
+-        create: setupNativeEvents(props.preload, props.explicitLinks, props.actionBase),
++        create: setupNativeEvents(props.preload, props.explicitLinks, props.actionBase, props.transformUrl),
+         utils: {
+             go: delta => window.history.go(delta),
+             beforeLeave
 diff --git a/dist/routers/StaticRouter.js b/dist/routers/StaticRouter.js
 index 4b49262f8702dafa2a56cd1f842ce698e386f6a9..9cf87de1064b1dad4e2b7abf0c7fd68bf14c2978 100644
 --- a/dist/routers/StaticRouter.js
