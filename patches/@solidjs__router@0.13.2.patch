@@ -1,5 +1,5 @@
 diff --git a/dist/routers/Router.js b/dist/routers/Router.js
-index 65cd04974482bb2968180d0da17f2083ff2f214f..13719e379e3a9142f31ed5c71739510d81ec3a85 100644
+index 65cd04974482bb2968180d0da17f2083ff2f214f..f353873f36c12b2d4c01453168c4e560308cb29d 100644
 --- a/dist/routers/Router.js
 +++ b/dist/routers/Router.js
 @@ -6,10 +6,13 @@ import { createBeforeLeave, keepDepth, notifyIfNotBlocked, saveCurrentDepth } fr
@@ -11,7 +11,7 @@ index 65cd04974482bb2968180d0da17f2083ff2f214f..13719e379e3a9142f31ed5c71739510d
 -        state: window.history.state
 -    });
 +    const getSource = () => {
-+        const url = window.location.pathname + window.location.search;
++    const url = window.location.pathname + window.location.search;
 +        return {
 +          value: props.transformUrl ? props.transformUrl(url) + window.location.hash : url + window.location.hash,
 +          state: window.history.state
@@ -35,3 +35,36 @@ index 4b49262f8702dafa2a56cd1f842ce698e386f6a9..9cf87de1064b1dad4e2b7abf0c7fd68b
      };
      return createRouterComponent({
          signal: [() => obj, next => Object.assign(obj, next)]
+diff --git a/dist/routers/components.jsx b/dist/routers/components.jsx
+index 48a7cdb2e09bd19fb67143290248c78b43af0e21..b022c9da79a9299adc0728dd4a758494856c8478 100644
+--- a/dist/routers/components.jsx
++++ b/dist/routers/components.jsx
+@@ -9,7 +9,8 @@ export const createRouterComponent = (router) => (props) => {
+     let context;
+     const routerState = createRouterContext(router, branches, () => context, {
+         base,
+-        singleFlight: props.singleFlight
++        singleFlight: props.singleFlight,
++        transformUrl: props.transformUrl
+     });
+     router.create && router.create(routerState);
+     return (<RouterContextObj.Provider value={routerState}>
+diff --git a/dist/routing.js b/dist/routing.js
+index ed3014a3e00317e21e85bb31b6d6dc603d10fc11..68cad84abf6988250e03daba2038f1d1b7432e8f 100644
+--- a/dist/routing.js
++++ b/dist/routing.js
+@@ -211,7 +211,13 @@ export function createRouterContext(integration, branches, getContext, options =
+     const location = createLocation(reference, state);
+     const referrers = [];
+     const submissions = createSignal(isServer ? initFromFlash() : []);
+-    const matches = createMemo(() => getRouteMatches(branches(), location.pathname));
++    const matches = createMemo(() => {
++        if (typeof options.transformUrl === "function") {
++          return getRouteMatches(branches(), options.transformUrl(location.pathname));
++        }
++
++        return getRouteMatches(branches(), location.pathname);
++    });
+     const params = createMemoObject(() => {
+         const m = matches();
+         const params = {};

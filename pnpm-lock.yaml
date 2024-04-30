@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@solidjs/router@0.13.2':
-    hash: fb7rcth4k2hzmylrdiegy5mahu
+    hash: zcicksbrswcuu6gfgwo65srajy
     path: patches/@solidjs__router@0.13.2.patch
 
 dependencies:
@@ -15,7 +15,7 @@ dependencies:
     version: 0.29.3(solid-js@1.8.17)
   '@solidjs/router':
     specifier: ^0.13.2
-    version: 0.13.2(patch_hash=fb7rcth4k2hzmylrdiegy5mahu)(solid-js@1.8.17)
+    version: 0.13.2(patch_hash=zcicksbrswcuu6gfgwo65srajy)(solid-js@1.8.17)
   '@solidjs/start':
     specifier: ^1.0.0-rc.0
     version: 1.0.0-rc.0(solid-js@1.8.17)(vinxi@0.3.11)(vite@5.2.10)
@@ -25,6 +25,11 @@ dependencies:
   vinxi:
     specifier: ^0.3.11
     version: 0.3.11
+
+devDependencies:
+  prettier:
+    specifier: ^3.2.5
+    version: 3.2.5
 
 packages:
 
@@ -1236,7 +1241,7 @@ packages:
       solid-js: 1.8.17
     dev: false
 
-  /@solidjs/router@0.13.2(patch_hash=fb7rcth4k2hzmylrdiegy5mahu)(solid-js@1.8.17):
+  /@solidjs/router@0.13.2(patch_hash=zcicksbrswcuu6gfgwo65srajy)(solid-js@1.8.17):
     resolution: {integrity: sha512-zPlQUXaaUMFzz70SNN8scITooBaJyvIJci3ilyHUBXr9+mzEJGCUSohRJx/VXKo9+p+HEBHY48GnChiPYfLsjg==}
     peerDependencies:
       solid-js: ^1.8.6
@@ -3362,6 +3367,12 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.2.0
     dev: false
+
+  /prettier@3.2.5:
+    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
 
   /pretty-bytes@6.1.1:
     resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}

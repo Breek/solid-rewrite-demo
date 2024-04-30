@@ -21,5 +21,8 @@
     "patchedDependencies": {
       "@solidjs/router@0.13.2": "patches/@solidjs__router@0.13.2.patch"
     }
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
   }
 }
